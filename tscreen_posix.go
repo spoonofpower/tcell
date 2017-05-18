@@ -122,18 +122,14 @@ type termiosPrivate struct {
 	tios C.struct_termios
 }
 
-func (t *tScreen) termioInit() error {
+func (t *tScreen) termioInit(tty *os.File) error {
 	var e error
 	var rv C.int
 	var newtios C.struct_termios
 	var fd C.int
 
-	if t.in, e = os.OpenFile("/dev/tty", os.O_RDONLY, 0); e != nil {
-		goto failed
-	}
-	if t.out, e = os.OpenFile("/dev/tty", os.O_WRONLY, 0); e != nil {
-		goto failed
-	}
+	t.in = tty
+	t.out = tty
 
 	t.tiosp = &termiosPrivate{}
 

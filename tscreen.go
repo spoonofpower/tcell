@@ -33,8 +33,8 @@ import (
 // For terminals that do not support dynamic resize events, the $LINES
 // $COLUMNS environment variables can be set to the actual window size,
 // otherwise defaults taken from the terminal database are used.
-func NewTerminfoScreen() (Screen, error) {
-	ti, e := LookupTerminfo(os.Getenv("TERM"))
+func NewTerminfoScreen(term string) (Screen, error) {
+	ti, e := LookupTerminfo(term)
 	if e != nil {
 		return nil, e
 	}
@@ -102,7 +102,7 @@ type tScreen struct {
 	sync.Mutex
 }
 
-func (t *tScreen) Init() error {
+func (t *tScreen) Init(tty *os.File) error {
 	t.evch = make(chan Event, 10)
 	t.indoneq = make(chan struct{})
 	t.charset = "UTF-8"
@@ -125,7 +125,7 @@ func (t *tScreen) Init() error {
 	if i, _ := strconv.Atoi(os.Getenv("COLUMNS")); i != 0 {
 		w = i
 	}
-	if e := t.termioInit(); e != nil {
+	if e := t.termioInit(tty); e != nil {
 		return e
 	}
 

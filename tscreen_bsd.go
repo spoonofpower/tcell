@@ -25,7 +25,7 @@ import (
 
 type termiosPrivate syscall.Termios
 
-func (t *tScreen) termioInit() error {
+func (t *tScreen) termioInit(tty *os.File) error {
 	var e error
 	var newtios termiosPrivate
 	var fd uintptr
@@ -33,12 +33,8 @@ func (t *tScreen) termioInit() error {
 	var ioc uintptr
 	t.tiosp = &termiosPrivate{}
 
-	if t.in, e = os.OpenFile("/dev/tty", os.O_RDONLY, 0); e != nil {
-		goto failed
-	}
-	if t.out, e = os.OpenFile("/dev/tty", os.O_WRONLY, 0); e != nil {
-		goto failed
-	}
+	t.in = tty
+	t.out = tty
 
 	tios = uintptr(unsafe.Pointer(t.tiosp))
 	ioc = uintptr(syscall.TIOCGETA)

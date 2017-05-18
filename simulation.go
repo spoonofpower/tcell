@@ -15,6 +15,7 @@
 package tcell
 
 import (
+	"os"
 	"sync"
 	"unicode/utf8"
 
@@ -107,7 +108,7 @@ type simscreen struct {
 	sync.Mutex
 }
 
-func (s *simscreen) Init() error {
+func (s *simscreen) Init(tty *os.File) error {
 	s.evch = make(chan Event, 10)
 	s.fillchar = 'X'
 	s.fillstyle = StyleDefault

@@ -14,12 +14,14 @@
 
 package tcell
 
+import "os"
+
 // Screen represents the physical (or emulated) screen.
 // This can be a terminal window or a physical console.  Platforms implement
 // this differerently.
 type Screen interface {
 	// Init initializes the screen for use.
-	Init() error
+	Init(*os.File) error
 
 	// Fini finalizes the screen also releasing resources.
 	Fini()
@@ -197,10 +199,10 @@ type Screen interface {
 
 // NewScreen returns a default Screen suitable for the user's terminal
 // environment.
-func NewScreen() (Screen, error) {
+func NewScreen(term string) (Screen, error) {
 	// First we attempt to obtain a terminfo screen.  This should work
 	// in most places if $TERM is set.
-	if s, e := NewTerminfoScreen(); s != nil {
+	if s, e := NewTerminfoScreen(term); s != nil {
 		return s, nil
 
 	} else if s, _ := NewConsoleScreen(); s != nil {
